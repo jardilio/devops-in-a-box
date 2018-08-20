@@ -1,0 +1,2 @@
+This is the proxy web server that is the only piece that is externally exposed. All other services with external visibility are exposed 
+via this proxy server leveraging a sub-path. Modify the (nginx.conf)[./nginx.conf] file to setup redirects.

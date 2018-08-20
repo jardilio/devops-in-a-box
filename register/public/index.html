@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/css/materialize.min.css" media="screen,projection" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+
+<body>
+    <nav>
+        <div class="nav-wrapper light-blue darken-4">
+            <a href="/" class="brand-logo">DevOps-in-a-Box</a>
+        </div>
+    </nav>
+
+    
+
+    <div class="container">
+        <div class="section">
+            <h5>User Registration</h5>
+        </div>  
+        <div class="row">
+            
+        </div>  
+        <form class="col s12 m6" method="POST" enctype="application/x-www-form-urlencoded">
+            <div class="input-field">
+                <input placeholder="John" id="fname" name="fname" type="text" class="validate" required>
+                <label for="fname">First Name</label>
+            </div>
+            <div class="input-field">
+                <input placeholder="Doe" id="lname" type="text" name="lname" class="validate" required>
+                <label for="lname">Last Name</label>
+            </div>
+            <div class="input-field">
+                <input placeholder="jdoe@nowhere.com" id="email" name="email" type="email" class="validate" required>
+                <label for="email">Email</label>
+            </div>
+            <div class="right">
+                <a href="/" class="modal-close waves-effect waves-green btn-flat">Cancel</a>
+                <button type="submit" class="btn waves-effect waves-green">Create</button>
+            </div>
+        </form>
+    </div>
+    
+    <div id="modal" class="modal">
+        <div class="modal-content">
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Ok</a>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/js/materialize.min.js"></script>
+    <script type="text/javascript">
+        var $form = $('form');
+        var $modal = $('#modal').modal();
+
+        $form.submit(function (event) {
+            event.preventDefault();
+
+            if ($form.find('.invalid').length > 0) return;
+
+            $.post('./', $form.serialize())
+                .done(function () {
+                    $form.trigger('reset');
+                })
+                .always(function (result) {
+                    $modal.find('.modal-content').html(result.responseText || result);
+                    $modal.modal('open');
+                });
+        });
+    </script>
+</body>
+</html>

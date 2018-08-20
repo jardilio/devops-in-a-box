@@ -1,0 +1,73 @@
+# Create the new organizational unit for managing users 
+dn: ou=users,{{ LDAP_BASE_DN }}
+changetype: add
+ou: users
+objectClass: organizationalUnit
+description: Default organizational unit for devops users
+
+# Create devops-system user 
+description: Internal system user for automated DevOps jobs
+dn: cn=devops-system,ou=users,{{ LDAP_BASE_DN }}
+changetype: add
+objectClass: inetOrgPerson
+cn: devops-system
+uid: devops-system
+givenName: DevOps
+sn: System
+mail: devops-system@local
+userPassword: {{ LDAP_READONLY_USER_PASSWORD_ENCRYPTED }}
+
+# Create devops-admin user
+description: Generic admin user account for access to DevOps applications
+dn: cn=devops-admin,ou=users,{{ LDAP_BASE_DN }}
+changetype: add
+objectClass: inetOrgPerson
+cn: devops-admin
+uid: devops-admin
+givenName: DevOps
+sn: Admin
+mail: devops-admin@local
+userPassword: {{ LDAP_READONLY_USER_PASSWORD_ENCRYPTED }}
+
+# Create devops-user user
+description: Generic user account for access to DevOps applications
+dn: cn=devops-user,ou=users,{{ LDAP_BASE_DN }}
+changetype: add
+objectClass: inetOrgPerson
+cn: devops-user
+uid: devops-user
+givenName: DevOps
+sn: User
+mail: devops-user@local
+userPassword: {{ LDAP_READONLY_USER_PASSWORD_ENCRYPTED }}
+
+# Create the new organizational unit for managing roles
+dn: ou=roles,{{ LDAP_BASE_DN }}
+changetype: add
+ou: roles
+objectClass: organizationalUnit
+description: Default organizational unit for devops roles
+
+# Create devops-admin role
+dn: cn=devops-admin,ou=roles,{{ LDAP_BASE_DN }}
+changetype: add
+objectClass: groupOfUniqueNames
+cn: devops-admin
+uniqueMember: cn=devops-admin,ou=users,{{ LDAP_BASE_DN }}
+
+# Create devops-system role
+dn: cn=devops-system,ou=roles,{{ LDAP_BASE_DN }}
+changetype: add
+objectClass: groupOfUniqueNames
+cn: devops-system
+uniqueMember: cn=devops-system,ou=users,{{ LDAP_BASE_DN }}
+uniqueMember: cn=devops-admin,ou=users,{{ LDAP_BASE_DN }}
+
+# Create devops-user role
+dn: cn=devops-user,ou=roles,{{ LDAP_BASE_DN }}
+changetype: add
+objectClass: groupOfUniqueNames
+cn: devops-user
+uniqueMember: cn=devops-user,ou=users,{{ LDAP_BASE_DN }}
+uniqueMember: cn=devops-system,ou=users,{{ LDAP_BASE_DN }}
+uniqueMember: cn=devops-admin,ou=users,{{ LDAP_BASE_DN }}

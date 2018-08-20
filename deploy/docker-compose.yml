@@ -1,0 +1,19 @@
+version: "3"
+services:
+
+  k8s:
+    image: femtopixel/kompose
+    working_dir: /workspace/deploy/k8s
+    entrypoint: ["sh", "build.sh"]
+    volumes:
+      - ../:/workspace
+
+  gcp:
+    image: google/cloud-sdk
+    command: sh ./deploy/gcp/deploy.sh
+    working_dir: /workspace
+    env_file: ./gcp/.env
+    volumes:
+      - ../:/workspace
+    depends_on:
+      - k8s

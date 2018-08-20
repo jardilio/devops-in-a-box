@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cruise xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cruise-config.xsd" schemaVersion="108">
+  <!-- https://docs.gocd.org/current/configuration/configuration_reference.html -->
+  <server artifactsdir="artifacts" agentAutoRegisterKey="d0853984-1b2b-4be7-8565-e1d6451e1596" webhookSecret="dc092332-8fe6-43f9-a8a9-9afca784bdde" commandRepositoryLocation="default" serverId="b5144283-94ee-4035-9b25-7f5159eaaffa" tokenGenerationKey="e8b02e87-ef77-4a29-99df-40bc902a62d0">
+    <security>
+      <authConfigs>
+        <authConfig id="openldap" pluginId="cd.go.authentication.ldap">
+          <property>
+            <key>Url</key>
+            <value>ldap://openldap:389</value>
+          </property>
+          <property>
+            <key>SearchBases</key>
+            <value>ou=users,${LDAP_BASE_DN}</value>
+          </property>
+          <property>
+            <key>ManagerDN</key>
+            <value>cn=readonly,${LDAP_BASE_DN}</value>
+          </property>
+          <property>
+            <key>Password</key>
+            <value>${LDAP_READONLY_USER_PASSWORD}</value>
+          </property>
+          <property>
+            <key>UserSearchFilter</key>
+            <value/>
+          </property>
+          <property>
+            <key>UserLoginFilter</key>
+            <value>(&amp;(uid={0})(memberof=cn=devops-user,ou=roles,${LDAP_BASE_DN}))</value>
+          </property>
+          <property>
+            <key>DisplayNameAttribute</key>
+            <value>cn</value>
+          </property>
+          <property>
+            <key>EmailAttribute</key>
+            <value>mail</value>
+          </property>
+        </authConfig>
+      </authConfigs>
+    </security>
+  </server>
+</cruise>

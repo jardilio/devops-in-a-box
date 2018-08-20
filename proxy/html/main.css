@@ -1,0 +1,7 @@
+.card-title {
+    color: grey;
+}
+.card .card-content {
+    position: relative;
+    min-height: 150px;
+}

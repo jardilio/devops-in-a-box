@@ -1,0 +1,3 @@
+A immutable deployed version of Jenkins. The application version, plugins, and configuration are all contained in source code and can then be deployed or rolled back. Volume is mounted separate for workspace data and configurations are reapplied at initialization of the service.
+
+Add any new plugins to [plugins.txt](./plugins.txt). Add any initialization scripts to [init.groovy.d](./init.groovy.d).
