@@ -1,45 +1,48 @@
-// see https://github.com/jenkinsci/gitlab-plugin/pull/559
-
-import jenkins.model.*;
-import com.dabsquared.gitlabjenkins.connection.GitLabConnection
-import com.cloudbees.plugins.credentials.*
-import com.cloudbees.plugins.credentials.common.*
-import com.cloudbees.plugins.credentials.domains.*
-import org.jenkinsci.plugins.plaincredentials.impl.*
-import com.cloudbees.jenkins.plugins.sshcredentials.impl.*
-import hudson.plugins.sshslaves.*
-import org.apache.commons.fileupload.*
-import org.apache.commons.fileupload.disk.*
-import java.nio.file.Files
-import com.dabsquared.gitlabjenkins.connection.GitLabApiTokenImpl
+import jenkins.*
+import hudson.*
+import jenkins.model.*
 import hudson.util.Secret
 import jenkins.security.*
+import com.cloudbees.plugins.credentials.*
+import com.cloudbees.plugins.credentials.impl.*
+import com.dabsquared.gitlabjenkins.connection.*
+import com.cloudbees.plugins.credentials.domains.Domain
 
-def gitlabPlugin = Jenkins.instance.getDescriptor("com.dabsquared.gitlabjenkins.connection.GitLabConnectionConfig")
-def env = System.getenv()
+def getOrCreateCredentials(defaultCredentials) {
+    def all = CredentialsProvider.lookupCredentials(
+        Credentials.class,
+        jenkins.model.Jenkins.instance
+    )
+    def credentials = all.findResult { it.getId() == defaultCredentials.getId() ? it : null }
+    if (credentials == null) {
+        println "creating new credentials for ${defaultCredentials.getId()}"
+        def store = SystemCredentialsProvider.getInstance().getStore();
+        credentials = defaultCredentials
+        store.addCredentials(Domain.global(), credentials)
+    }
+    else {
+        println "credentials for ${defaultCredentials.getId()} already exist"
+    }
+    return credentials
+}
 
-global_domain = Domain.global()
-credentials_store =
-  Jenkins.instance.getExtensionList(
-    'com.cloudbees.plugins.credentials.SystemCredentialsProvider'
-  )[0].getStore()
-
-def connections = new ArrayList<>();
-def gitlabCredentials = new GitLabApiTokenImpl(
+def credentials = getOrCreateCredentials(new GitLabApiTokenImpl(
     CredentialsScope.GLOBAL,
-    "gitlab",
-    "gitlab API key for gitlab - ${env.GITLAB_URL}",
-    new Secret(env.GITLAB_TOKEN)
-)
+    "gitlab", 
+    "Gitlab API token - NO RESTART NEEDED ON CHANGE", 
+    new Secret("P@ssw0rd")  //just the default value, user should update post run
+))
+
+def plugin = Jenkins.instance.getDescriptor("com.dabsquared.gitlabjenkins.connection.GitLabConnectionConfig")
+def connections = new ArrayList<>();
 def gitlabConfig = new GitLabConnection(
     "gitlab",
-    env.GITLAB_URL,
-    env.GITLAB_TOKEN,
+    "http://gitlab:80/gitlab/",
+    credentials.getId(),
     true,
     10,
     10
 )
-
-credentials_store.addCredentials(global_domain, gitlabCredentials)
 connections.add(gitlabConfig)
-gitlabPlugin.setConnections(connections)
+plugin.setConnections(connections)
+plugin.save()

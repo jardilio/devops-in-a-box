@@ -61,6 +61,48 @@ are defined in [.env](./.env) and is read in automatically by `docker-compose` w
 These settings are also used to generate k8s configurations and should be set for the 
 target environment you will deploy to.
 
+## Initial Environment Setup
+
+1. Replace the default passwords 'P@ssw0rd' in `.env` before building your new environment
+    * Passwords can be updated at runtime in the environment from () 
+    using `cn=admin,dc=devops` (or your currently configured dc) and current admin password
+    * Note that some services require these passwords to be passed in as a secrete (ie for LDAP integration), if 
+    these values are changed in the environment, then configurations for services need to be updated and 
+    restarted to take effect.
+2. Create new API token for Gitlab using `devops-system` user 
+    * Go to http://localhost/gitlab/profile/personal_access_tokens
+    * Use `jenkins` for the identity name and generate a new API key
+    * Copy the generated API key for step 4
+3. Create new API token for SonarQube using `devops-system` user
+    * Go to http://localhost/sonarqube/account/security/
+    * Use `jenkins` for the identity name and generate a new API key
+    * Copy the generated API key for step 4
+4. Update credentials used by Jenkins using `devops-admin` user
+    * Go to http://localhost/jenkins/credentials/store/system/domain/_/
+    * Update the credential tokens for Gitlab and SonarQube with the values from steps 2 and 3
+5. Restart Jenkins 
+    * Go to http://localhost/jenkins/safeRestart
+    * Confirm to restart
+
+## Starting a New Project
+1. Create new source project repo in Gitlab with a Jenkinsfile
+    * Go to http://localhost/gitlab/projects/new
+    * Example, import from https://github.com/jardilio/express-app-testing-demo.git
+    * Project should optionally have a `jenkins.properties` and `sonar-project.properties` file (see example for reference)
+    * The `Jenkinsfile` in the reference example leverages convienence functions from the internal `doiab` library
+2. Create new artifact repository in Artifactory 
+    * Go to http://localhost/artifactory/webapp/#/admin/repository/local/new
+    * Select the appropriate project type (ie generic) 
+    * Provide a name, when using the referecen pipeline, name should match the `app.id` from `jenkins.properties`, by 
+    default, this value is the name of the jenkins job if not provided.
+3. Create new multibranch pipeline job in Jenkins 
+    * Go to http://localhost/jenkins/view/all/newJob
+    * Provide a name and select multibranch pipeline
+    * Use your new project repo URL from Gitlab as the source
+    * Use the Gitlab credentials from the dropdown
+    * Save and run the new job
+
+
 # Building and Deploying
 
 * Set `DOCKER_IMAGE_TAG` with a version you want to tag the new build as (default is latest). Optionally you may want to set or change 

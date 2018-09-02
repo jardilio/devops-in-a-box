@@ -1,4 +1,4 @@
-FROM sonarqube:6.4
+FROM sonarqube:6.7
 
 RUN apt-get update && apt-get install -y \
     gettext-base
@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y \
 COPY init.sh /init.sh
 RUN chmod +x /init.sh
 
-COPY conf /opt/sonarqube/conf
+COPY conf /opt/sonarqube/conf/
 COPY plugins /opt/sonarqube/extensions/plugins/
 
 CMD ["/init.sh"]

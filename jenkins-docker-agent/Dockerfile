@@ -23,7 +23,9 @@ RUN curl --create-dirs -sSLo /usr/share/jenkins/swarm-client.jar https://repo.je
 RUN apt update && apt install -y git
 
 ENTRYPOINT ["wrapdocker"]
-CMD ["/usr/bin/java", "-jar", "/usr/share/jenkins/swarm-client.jar", "-master", "http://jenkins:8080/jenkins", "-username", "devops-system", "-passwordEnvVariable", "JENKINS_AGENT_PASSWORD", "-labels", "docker", "-name", "docker-agent", "-showHostName"]
+#CMD ["/usr/bin/java", "-jar", "/usr/share/jenkins/swarm-client.jar", "-master", "http://jenkins:8080/jenkins", "-username", "devops-system", "-passwordEnvVariable", "JENKINS_AGENT_PASSWORD", "-labels", "docker", "-name", "docker-agent", "-showHostName"]
+COPY startup.sh /
+CMD [ "/startup.sh" ]
 
 VOLUME [ "/workspace" ]
 

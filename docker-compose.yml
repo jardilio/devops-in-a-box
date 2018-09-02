@@ -88,8 +88,8 @@ services:
       LDAP_READONLY_USER_PASSWORD: $LDAP_READONLY_USER_PASSWORD
       GITLAB_TOKEN: $GITLAB_TOKEN
       GITLAB_URL: $DOS_PROTOCOL://$DOS_HOSTNAME/gitlab
-      POSTGRESQL_USER_PASSWORD: $DOS_SYSTEM_USER_PASSWORD
-      INITIAL_PASSWORD: $DOS_SYSTEM_USER_PASSWORD
+      POSTGRESQL_USER_PASSWORD: $LDAP_SYSTEM_USER_PASSWORD
+      INITIAL_PASSWORD: $LDAP_SYSTEM_USER_PASSWORD
     depends_on:
       - openldap
       - proxy
@@ -110,7 +110,7 @@ services:
       - gitlab-database-data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: gitlab
-      POSTGRES_PASSWORD: $DOS_SYSTEM_USER_PASSWORD
+      POSTGRES_PASSWORD: $LDAP_SYSTEM_USER_PASSWORD
       # known issue with volume - creats k8s problem with non-block initial directory on mount
       PGDATA: /var/lib/postgresql/data/pgdata
     ports:
@@ -132,14 +132,12 @@ services:
     image: ${DOCKER_IMAGE_ACCOUNT}/${DOCKER_IMAGE_PREFIX}jenkins:${DOCKER_IMAGE_TAG}
     build: ./jenkins
     volumes:
-      - jenkins-data:/var/jenkins_home
+      - jenkins-data:/var/jenkins_home:rw
     environment:
       LDAP_BASE_DN: $LDAP_BASE_DN
       LDAP_READONLY_USER_PASSWORD: $LDAP_READONLY_USER_PASSWORD
-      GITLAB_TOKEN: $GITLAB_TOKEN
       GITLAB_URL: $DOS_PROTOCOL://$DOS_HOSTNAME/gitlab
       JENKINS_URL: $DOS_PROTOCOL://$DOS_HOSTNAME/jenkins
-      DOS_SYSTEM_USER_PASSWORD: $DOS_SYSTEM_USER_PASSWORD
     depends_on:
       - proxy
       - openldap
@@ -157,11 +155,12 @@ services:
     image: ${DOCKER_IMAGE_ACCOUNT}/${DOCKER_IMAGE_PREFIX}jenkins-docker-agent:${DOCKER_IMAGE_TAG}
     build: ./jenkins-docker-agent
     privileged: true
-    environment:
-      JENKINS_AGENT_PASSWORD: $DOS_SYSTEM_USER_PASSWORD
     deploy:
       mode: replicated
       replicas: 2
+    volumes:
+      - jenkins-workspace:/workspace
+      - jenkins-data:/var/jenkins_home:ro
     # TODO: volume mapping for jenkins workspace share and docker image cache
 
   rocketchat:
@@ -214,7 +213,7 @@ services:
       LDAP_BASE_DN: $LDAP_BASE_DN
       LDAP_READONLY_USER_PASSWORD: $LDAP_READONLY_USER_PASSWORD
     healthcheck:
-      test: curl --fail http://localhost:8081//artifactory/api/system/ping || exit 1
+      test: curl --fail http://localhost:8081/artifactory/api/system/ping || exit 1
       interval: 10s
       timeout: 5s
       retries: 5
@@ -227,7 +226,7 @@ services:
     environment:
       LDAP_BASE_DN: $LDAP_BASE_DN
       LDAP_READONLY_USER_PASSWORD: $LDAP_READONLY_USER_PASSWORD
-      SONARQUBE_JDBC_PASSWORD: $DOS_SYSTEM_USER_PASSWORD
+      SONARQUBE_JDBC_PASSWORD: $LDAP_SYSTEM_USER_PASSWORD
     depends_on:
       - openldap
       - sonarqube-database
@@ -246,7 +245,7 @@ services:
       - sonarqube-database-data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: sonar
-      POSTGRES_PASSWORD: $DOS_SYSTEM_USER_PASSWORD
+      POSTGRES_PASSWORD: $LDAP_SYSTEM_USER_PASSWORD
       # known issue with volume - creats k8s problem with non-black initial directory on mount
       PGDATA: /var/lib/postgresql/data/pgdata
     ports:
@@ -284,6 +283,7 @@ volumes:
   gitlab-database-data:
   gitlab-redis-data:
   jenkins-data:
+  jenkins-workspace:
   rocketchat-data:
   rocketchat-database-data:
   artifactory-data:

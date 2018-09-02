@@ -43,7 +43,3 @@ strategy.add(Computer.CREATE,'devops-system')
 strategy.add(Computer.DISCONNECT,'devops-system')
 instance.setAuthorizationStrategy(strategy)
 instance.save()
-
-//User u = User.get("jenkins-job-builder")  
-//ApiTokenProperty t = u.getProperty(ApiTokenProperty.class)
-//def token = t.getApiToken()
