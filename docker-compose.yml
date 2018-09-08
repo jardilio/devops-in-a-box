@@ -86,7 +86,6 @@ services:
     environment:
       LDAP_BASE_DN: $LDAP_BASE_DN
       LDAP_READONLY_USER_PASSWORD: $LDAP_READONLY_USER_PASSWORD
-      GITLAB_TOKEN: $GITLAB_TOKEN
       GITLAB_URL: $DOS_PROTOCOL://$DOS_HOSTNAME/gitlab
       POSTGRESQL_USER_PASSWORD: $LDAP_SYSTEM_USER_PASSWORD
       INITIAL_PASSWORD: $LDAP_SYSTEM_USER_PASSWORD
@@ -199,6 +198,17 @@ services:
       timeout: 5s
       retries: 5
 
+  hubot:
+    image: ${DOCKER_IMAGE_ACCOUNT}/${DOCKER_IMAGE_PREFIX}hubot:${DOCKER_IMAGE_TAG}
+    build: ./hubot
+    environment: 
+      ROCKETCHAT_PASSWORD: $LDAP_SYSTEM_USER_PASSWORD
+      HUBOT_JENKINS_AUTH: devops-system:$LDAP_SYSTEM_USER_PASSWORD
+    depends_on: 
+      - rocketchat
+    volumes:
+      - hubot-config:/home/hubot/scripts/config
+
   artifactory:
     image: ${DOCKER_IMAGE_ACCOUNT}/${DOCKER_IMAGE_PREFIX}artifactory:${DOCKER_IMAGE_TAG}
     build: ./artifactory
@@ -291,3 +301,4 @@ volumes:
   sonarqube-database-data:
   gocd-artifacts:
   gocd-database:
+  hubot-config:

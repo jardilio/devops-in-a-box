@@ -4,7 +4,8 @@
 
 * [Jenkins](./jenkins) - Solution for continuous integration
 * [GitLab](./gitlab) - Solution for code repository, review and task management
-* [Rocket.Chat](./rocketchat) - Solution for team communications and chatbots
+* [Rocket.Chat](./rocketchat) - Solution for team communications
+* [Hubot](./hubot) - Solution for chatbots interfaced through Rocket.Chat and integrated with other services
 * [Artifactory](./artifactory) - Solution for managing build artifacts and dependencies
 * [SonarQube](./sonarqube) - Solution for managing code quality
 * [GoCD](./gocd) - Solution for continuous deployment
@@ -63,7 +64,7 @@ target environment you will deploy to.
 
 ## Initial Environment Setup
 
-1. Replace the default passwords 'P@ssw0rd' in `.env` before building your new environment
+1. (Optional for local demo) Replace the default passwords 'P@ssw0rd' in `.env` before building your new environment
     * Passwords can be updated at runtime in the environment from () 
     using `cn=admin,dc=devops` (or your currently configured dc) and current admin password
     * Note that some services require these passwords to be passed in as a secrete (ie for LDAP integration), if 
@@ -71,36 +72,50 @@ target environment you will deploy to.
     restarted to take effect.
 2. Create new API token for Gitlab using `devops-system` user 
     * Go to http://localhost/gitlab/profile/personal_access_tokens
-    * Use `jenkins` for the identity name and generate a new API key
-    * Copy the generated API key for step 4
+    * Use `devops` for the identity name and generate a new API key
+    * Copy the generated API key for later
 3. Create new API token for SonarQube using `devops-system` user
     * Go to http://localhost/sonarqube/account/security/
-    * Use `jenkins` for the identity name and generate a new API key
-    * Copy the generated API key for step 4
+    * Use `devops` for the identity name and generate a new API key
+    * Copy the generated API key for later
 4. Update credentials used by Jenkins using `devops-admin` user
     * Go to http://localhost/jenkins/credentials/store/system/domain/_/
     * Update the credential tokens for Gitlab and SonarQube with the values from steps 2 and 3
-5. Restart Jenkins 
+5. Update configurations used by Hubot using `devops-admin` user
+    * Got to http://localhost/rocketchat/direct/devops.system
+    * Type in `env set GITLAB_TOKEN [INSERT_COPIED_TOKEN]`
+    * Type in `reload` for changes to take effect
+6. Restart Jenkins 
     * Go to http://localhost/jenkins/safeRestart
     * Confirm to restart
 
 ## Starting a New Project
+
+TODO: Automate as a self-service option
+
 1. Create new source project repo in Gitlab with a Jenkinsfile
-    * Go to http://localhost/gitlab/projects/new
+    * Go to http://localhost/gitlab/projects/new using the devops-system user
     * Example, import from https://github.com/jardilio/express-app-testing-demo.git
     * Project should optionally have a `jenkins.properties` and `sonar-project.properties` file (see example for reference)
     * The `Jenkinsfile` in the reference example leverages convienence functions from the internal `doiab` library
 2. Create new artifact repository in Artifactory 
-    * Go to http://localhost/artifactory/webapp/#/admin/repository/local/new
+    * Go to http://localhost/artifactory/webapp/#/admin/repository/local/new using the devops-system user
     * Select the appropriate project type (ie generic) 
-    * Provide a name, when using the referecen pipeline, name should match the `app.id` from `jenkins.properties`, by 
+    * Provide a name, when using the reference pipeline, name should match the `app.id` from `jenkins.properties`, by 
     default, this value is the name of the jenkins job if not provided.
 3. Create new multibranch pipeline job in Jenkins 
-    * Go to http://localhost/jenkins/view/all/newJob
+    * Go to http://localhost/jenkins/view/all/newJob using the devops-admin user
     * Provide a name and select multibranch pipeline
-    * Use your new project repo URL from Gitlab as the source
+    * Use your new project repo URL from Gitlab as the source (remember to use domains that are accessible between services, ie `localhost` will not work, instead use external domain name or internal service path, ie http://gitlab/gitab/REPO_NAME/PROJECT_NAME)
     * Use the Gitlab credentials from the dropdown
     * Save and run the new job
+
+TODO: Gitlab webhook setup https://github.com/jenkinsci/gitlab-plugin
+
+4. Create a webhook from Gitlab to Jenkins to build on changes to source
+    * Go to http://localhost/gitlab/projects and select your project
+    * Navigate to `Settings > Integrations`
+    * Create a webhook to Jenkins using `http://jenkins:8080/jenkins/project[/JOB_FOLDER_PATH]/JOB_NAME`
 
 
 # Building and Deploying
