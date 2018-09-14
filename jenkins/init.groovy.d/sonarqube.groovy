@@ -31,8 +31,11 @@ def credentials = getOrCreateCredentials(new UsernamePasswordCredentialsImpl(
     "sonarqube", 
     "SonarQube API username and token - RESTART JENKINS ON CHANGE", 
     "devops-system", 
-    "P@ssw0rd"  //just the default value, user should update post run
+    ""  //just a default value, user should create in SonarQuybe and update post initial run
 ))
+
+//TODO: check on timer if token is empty and try to create one using devops-system credentials
+///sonarqube/api/user_tokens/generate POST name:test,login:devops-system => {"login":"devops-system","name":"test","token":"foobar"}
 
 def instance = Jenkins.getInstance()
 def plugins = instance.getPluginManager().getPlugins();

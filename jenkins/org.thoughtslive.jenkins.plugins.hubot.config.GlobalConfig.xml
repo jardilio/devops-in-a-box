@@ -1,0 +1,14 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<org.thoughtslive.jenkins.plugins.hubot.config.GlobalConfig plugin="hubot-steps@2.0.2">
+  <sites>
+    <org.thoughtslive.jenkins.plugins.hubot.config.HubotSite>
+      <defaultSite>true</defaultSite>
+      <name>hubot</name>
+      <url>http://rocketchat:3000/rocketchat</url>
+      <room>general</room>
+      <roomPrefix></roomPrefix>
+      <failOnError>false</failOnError>
+      <useFolderName>true</useFolderName>
+    </org.thoughtslive.jenkins.plugins.hubot.config.HubotSite>
+  </sites>
+</org.thoughtslive.jenkins.plugins.hubot.config.GlobalConfig>

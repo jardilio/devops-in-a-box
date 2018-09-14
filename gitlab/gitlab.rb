@@ -5,6 +5,7 @@
 ##! settings that can be configured by this file, which may be found at:
 ##! https://gitlab.com/gitlab-org/omnibus-gitlab/raw/master/files/gitlab-config-template/gitlab.rb.template
 
+#application_setting_allow_local_requests_from_hooks_and_services
 
 ## GitLab URL
 ##! URL on which GitLab will be reachable.

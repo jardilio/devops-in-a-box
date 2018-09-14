@@ -70,6 +70,13 @@ target environment you will deploy to.
     * Note that some services require these passwords to be passed in as a secrete (ie for LDAP integration), if 
     these values are changed in the environment, then configurations for services need to be updated and 
     restarted to take effect.
+2. Setup Gitlab root account
+    * Go to http://localhost/gitlab/
+    * Login using `Standard` mode using `root` and `P@ssw0rd`
+    * Go to http://localhost/gitlab/admin/hooks
+    * Create a new hook to `http://jenkins:8080/jenkins/generic-webhook-trigger/invoke` using all triggers
+    * (Optional) Go to http://localhost/gitlab/profile/password/edit and change your root password
+    * Logout http://localhost/gitlab/users/sign_out 
 2. Create new API token for Gitlab using `devops-system` user 
     * Go to http://localhost/gitlab/profile/personal_access_tokens
     * Use `devops` for the identity name and generate a new API key
@@ -91,31 +98,14 @@ target environment you will deploy to.
 
 ## Starting a New Project
 
-TODO: Automate as a self-service option
+Create new source project repo in Gitlab with a Jenkinsfile
 
-1. Create new source project repo in Gitlab with a Jenkinsfile
-    * Go to http://localhost/gitlab/projects/new using the devops-system user
+* Go to http://localhost/gitlab/projects/new using any user
     * Example, import from https://github.com/jardilio/express-app-testing-demo.git
-    * Project should optionally have a `jenkins.properties` and `sonar-project.properties` file (see example for reference)
-    * The `Jenkinsfile` in the reference example leverages convienence functions from the internal `doiab` library
-2. Create new artifact repository in Artifactory 
-    * Go to http://localhost/artifactory/webapp/#/admin/repository/local/new using the devops-system user
-    * Select the appropriate project type (ie generic) 
-    * Provide a name, when using the reference pipeline, name should match the `app.id` from `jenkins.properties`, by 
-    default, this value is the name of the jenkins job if not provided.
-3. Create new multibranch pipeline job in Jenkins 
-    * Go to http://localhost/jenkins/view/all/newJob using the devops-admin user
-    * Provide a name and select multibranch pipeline
-    * Use your new project repo URL from Gitlab as the source (remember to use domains that are accessible between services, ie `localhost` will not work, instead use external domain name or internal service path, ie http://gitlab/gitab/REPO_NAME/PROJECT_NAME)
-    * Use the Gitlab credentials from the dropdown
-    * Save and run the new job
-
-TODO: Gitlab webhook setup https://github.com/jenkinsci/gitlab-plugin
-
-4. Create a webhook from Gitlab to Jenkins to build on changes to source
-    * Go to http://localhost/gitlab/projects and select your project
-    * Navigate to `Settings > Integrations`
-    * Create a webhook to Jenkins using `http://jenkins:8080/jenkins/project[/JOB_FOLDER_PATH]/JOB_NAME`
+* Project should optionally have a `jenkins.properties` and `sonar-project.properties` file (see example for reference)
+* The `Jenkinsfile` in the reference example leverages convienence functions from the internal `devops` library (see example for reference)
+* Go to the project `Settings` page in Gitlab, select `Members` and add `devops-system` as `master`
+* Jenkins will be notified of the new project and create a matching job to build it. A webhook will also be created automatically to build when commits are pushed to the repo.
 
 
 # Building and Deploying

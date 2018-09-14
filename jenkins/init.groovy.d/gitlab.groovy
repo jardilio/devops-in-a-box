@@ -30,7 +30,7 @@ def credentials = getOrCreateCredentials(new GitLabApiTokenImpl(
     CredentialsScope.GLOBAL,
     "gitlab", 
     "Gitlab API token - NO RESTART NEEDED ON CHANGE", 
-    new Secret("P@ssw0rd")  //just the default value, user should update post run
+    new Secret("")  //just a default value, user should create on gitlab update post initial run
 ))
 
 def plugin = Jenkins.instance.getDescriptor("com.dabsquared.gitlabjenkins.connection.GitLabConnectionConfig")
@@ -46,3 +46,5 @@ def gitlabConfig = new GitLabConnection(
 connections.add(gitlabConfig)
 plugin.setConnections(connections)
 plugin.save()
+
+//TODO: setup a timer, check for access to all project repos, make sure we have a matching jenkins project
