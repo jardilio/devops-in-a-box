@@ -37,9 +37,7 @@ def pushSonarQube(scope) {
             -Dsonar.projectVersion=${props['app.version']} \
             -Dsonar.projectKey=${props['app.id']} \
             -Dsonar.links.scm=${props['app.repo']} \
-            -Dsonar.links.ci=${env.JENKINS_URL}job/${env.JOB_NAME} \
-            -Dsonar.junit.reportsPath=coverage \
-            -Dsonar.tests=coverage"""
+            -Dsonar.links.ci=${env.JENKINS_URL}job/${env.JOB_NAME}"""
         }
         waitSonarQube(scope)
     }
