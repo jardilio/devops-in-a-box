@@ -6,15 +6,15 @@ supplement.
 def getProjectProperties(scope) {
     scope.with {
         def props = readProperties file: './jenkins.properties', defaults: [
-            'app.id': env.JOB_NAME,
+            'app.id': env.JOB_NAME.replaceAll(/[\\\/\s]/, ":"),
             'app.name': env.JOB_NAME,
-            'app.version': env.GIT_COMMIT ?: 'latest',
+            'app.version': env.GIT_COMMIT,
             'app.repo': env.GIT_URL
         ]
 
         props['project.branch'] = env.BRANCH_NAME ?: 'master'
         props['project.releaseable'] = props['project.branch'] == 'master' || props['project.branch'].startsWith('release')
-        props['project.artifacts.target'] = "${props['app.id']}/${props['app.version']}"
+        props['project.artifacts.target'] = "${props['app.name']}/${props['app.version']}"
 
         return props
     }
@@ -41,21 +41,18 @@ def pushSonarQube(scope) {
             -Dsonar.junit.reportsPath=coverage \
             -Dsonar.tests=coverage"""
         }
-        waitForQualityGate(scope)
+        waitSonarQube(scope)
     }
 }
 
 def waitSonarQube(scope) {
     scope.with {
-        echo "TODO: Need to add webhook from SonarQube back to Jenkins for quality gate monitoring"
-        /*
-        echo "Waiting for SonarQube to ensure build has passed quality gates"
         timeout(time: 10, unit: 'MINUTES') {
             def result = waitForQualityGate()
             if (result.status != "OK") {
                 error "Pipeline aborted due to quality gate failure: ${result.status}" 
             }
-        }*/
+        }
     }
 }
 
@@ -67,7 +64,7 @@ requested to archive.
 def pushArtifactory(scope, artifacts) {
     scope.with {
         //only push if passed quality gate
-        waitForQualityGate(scope)
+        waitSonarQube(scope)
 
         def props = getProjectProperties(scope)
         def server = Artifactory.server 'artifactory'
@@ -130,11 +127,10 @@ def pushArtifactory(scope, artifacts) {
 
             sh "#!/bin/sh -e\n curl -X POST -H 'Content-Type: application/json' -d '${repo}' --user '${user}' '${url}/ui/admin/repositories'"
             sh "git log --pretty=medium > _change.log"
-            sh "echo foo > _build.log"
-            //currentBuild.rawBuild.log > _build.log
+            writeFile file: '_build.log', text: currentBuild.rawBuild.log, encoding: 'UTF-8'
             
             def build = Artifactory.newBuildInfo() 
-            buildInfo.env.capture = true
+            build.env.capture = true
             server.upload(spec)
             server.publishBuildInfo(build)
 

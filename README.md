@@ -64,37 +64,45 @@ target environment you will deploy to.
 
 ## Initial Environment Setup
 
-1. (Optional for local demo) Replace the default passwords 'P@ssw0rd' in `.env` before building your new environment
-    * Passwords can be updated at runtime in the environment from () 
+1. (Optional for local dev) Replace the default passwords 'P@ssw0rd' 
+    * Update `.env` before building your new environment
+    * Passwords can be updated at runtime in the environment from http://localhost/openldap/
     using `cn=admin,dc=devops` (or your currently configured dc) and current admin password
     * Note that some services require these passwords to be passed in as a secrete (ie for LDAP integration), if 
     these values are changed in the environment, then configurations for services need to be updated and 
     restarted to take effect.
-2. Setup Gitlab root account
+2. Setup Gitlab admin account
     * Go to http://localhost/gitlab/
     * Login using `Standard` mode using `root` and `P@ssw0rd`
     * Go to http://localhost/gitlab/admin/hooks
     * Create a new hook to `http://jenkins:8080/jenkins/generic-webhook-trigger/invoke` using all triggers
-    * (Optional) Go to http://localhost/gitlab/profile/password/edit and change your root password
+    * (Optional for local dev) Go to http://localhost/gitlab/profile/password/edit and change your root password
     * Logout http://localhost/gitlab/users/sign_out 
-2. Create new API token for Gitlab using `devops-system` user 
+3. Create new API token for Gitlab using `devops-system` user under `LDAP`
     * Go to http://localhost/gitlab/profile/personal_access_tokens
     * Use `devops` for the identity name and generate a new API key
     * Copy the generated API key for later
-3. Create new API token for SonarQube using `devops-system` user
+4. Setup SonQube admin account
+    * Go to http://localhost/sonarqube
+    * Login using `admin` as both username and password
+    * Go to http://localhost/sonarqube/admin/settings?category=webhooks
+    * Create a new hook to `http://jenkins:8080/jenkins/sonarqube-webhook/`
+    * (Optional for local dev) Go to http://localhost/sonarqube/account/security/ and change your admin password
+    * Logout 
+4. Create new API token for SonarQube using `devops-system` user
     * Go to http://localhost/sonarqube/account/security/
     * Use `devops` for the identity name and generate a new API key
     * Copy the generated API key for later
-4. Update credentials used by Jenkins using `devops-admin` user
+5. Update credentials used by Jenkins using `devops-admin` user
     * Go to http://localhost/jenkins/credentials/store/system/domain/_/
     * Update the credential tokens for Gitlab and SonarQube with the values from steps 2 and 3
-5. Update configurations used by Hubot using `devops-admin` user
-    * Got to http://localhost/rocketchat/direct/devops.system
-    * Type in `env set GITLAB_TOKEN [INSERT_COPIED_TOKEN]`
-    * Type in `reload` for changes to take effect
 6. Restart Jenkins 
     * Go to http://localhost/jenkins/safeRestart
     * Confirm to restart
+7. Update configurations used by Hubot using `devops-admin` user
+    * Go to http://localhost/rocketchat/direct/devops.system
+    * Type in `env set GITLAB_TOKEN [INSERT_COPIED_TOKEN]`
+    * Type in `reload` for changes to take effect
 
 ## Starting a New Project
 

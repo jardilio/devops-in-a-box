@@ -15,4 +15,5 @@ done
     -passwordFile $PWORDFILE \
     -labels docker \
     -name docker-agent \
+    -executors 2 \
     -showHostName

@@ -17,7 +17,8 @@ ENV HUBOT_JENKINS_AUTH=devops-system:P@ssw0rd
 ENV HUBOT_GITLAB_URL=http://gitlab:80/gitlab
 #ENV HUBOT_GITLAB_ACCESSKEY=
 
-ENV EXTERNAL_SCRIPTS=hubot-help,hubot-jenkins,hubot-gitlab,hubot-reload-scripts
+ENV EXTERNAL_SCRIPTS=hubot-help,hubot-jenkins,hubot-reload-scripts
+#,hubot-gitlab
 
 VOLUME [ "/home/hubot/scripts/config" ]
 

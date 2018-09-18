@@ -154,6 +154,8 @@ services:
     image: ${DOCKER_IMAGE_ACCOUNT}/${DOCKER_IMAGE_PREFIX}jenkins-docker-agent:${DOCKER_IMAGE_TAG}
     build: ./jenkins-docker-agent
     privileged: true
+    environment:
+      JENKINS_AGENT_PASSWORD: $LDAP_SYSTEM_USER_PASSWORD
     deploy:
       mode: replicated
       replicas: 2
@@ -266,25 +268,25 @@ services:
       timeout: 5s
       retries: 5
 
-  gocd:
-    image: ${DOCKER_IMAGE_ACCOUNT}/${DOCKER_IMAGE_PREFIX}gocd:${DOCKER_IMAGE_TAG}
-    build: ./gocd
-    environment:
-      LDAP_BASE_DN: $LDAP_BASE_DN
-      LDAP_READONLY_USER_PASSWORD: $LDAP_READONLY_USER_PASSWORD
-    volumes:
-      - gocd-artifacts:/godata/artifacts
-      - gocd-database:/godata/db
-    ports:
-      - 8153
-    depends_on:
-      - openldap
-      - proxy
-    healthcheck:
-      test: curl --fail http://localhost:8153 || exit 1
-      interval: 1m
-      timeout: 5s
-      retries: 5
+  # gocd:
+  #   image: ${DOCKER_IMAGE_ACCOUNT}/${DOCKER_IMAGE_PREFIX}gocd:${DOCKER_IMAGE_TAG}
+  #   build: ./gocd
+  #   environment:
+  #     LDAP_BASE_DN: $LDAP_BASE_DN
+  #     LDAP_READONLY_USER_PASSWORD: $LDAP_READONLY_USER_PASSWORD
+  #   volumes:
+  #     - gocd-artifacts:/godata/artifacts
+  #     - gocd-database:/godata/db
+  #   ports:
+  #     - 8153
+  #   depends_on:
+  #     - openldap
+  #     - proxy
+  #   healthcheck:
+  #     test: curl --fail http://localhost:8153 || exit 1
+  #     interval: 1m
+  #     timeout: 5s
+  #     retries: 5
 
 volumes:
   openldap-data:
@@ -299,6 +301,6 @@ volumes:
   artifactory-data:
   sonarqube-data:
   sonarqube-database-data:
-  gocd-artifacts:
-  gocd-database:
+  # gocd-artifacts:
+  # gocd-database:
   hubot-config:
