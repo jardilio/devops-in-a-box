@@ -151,3 +151,38 @@ def pushNotifications(scope) {
         echo "TODO: notify Gitlab, RocketChat, GoCD..."
     }
 }
+
+/*
+This is all temp stuff for now, WIP
+*/
+def deployGCPAppEngine(scope, imageFile, imageName, projectId) {
+    scope.with {
+        def props = getProjectProperties(scope)
+        /*def server = Artifactory.server 'artifactory'
+        def files = """{"files":[
+                {"pattern": "${imageFile}","target":"${props['project.artifacts.target']}/"}
+            ]}"""
+        server.download(files)*/
+        
+        withCredentials([usernameColonPassword(credentialsId: 'devops-system', variable: 'USERPASS')]) {
+            sh "curl -u $USERPASS http://artifactory:8081/artifactory/${props['project.artifacts.target']}/${imageFile} > ${imageFile}"
+        }
+        
+        docker.image('google/cloud-sdk').inside('-v /var/run/docker.sock:/var/run/docker.sock') {
+            withCredentials([
+                string(credentialsId: 'gcp-account', variable: 'GCP_ACCOUNT'), 
+                file(credentialsId: 'gcp-key-file', variable: 'GCP_KEY_FILE')]) {
+                
+                sh "gcloud auth activate-service-account $GCP_ACCOUNT --key-file=$GCP_KEY_FILE"
+                sh "gcloud auth configure-docker"
+                sh "docker image load -i ./${imageFile}"
+                sh "docker tag ${imageName} gcr.io/${projectId}/${imageName}"
+                sh "docker image push gcr.io/${projectId}/${imageName}"
+                sh "gcloud app create --project $projectId --region=us-central || echo 'app already exists...continuing'"
+                sh "echo runtime: custom > app.yaml"
+                sh "echo env: flex >> app.yaml"
+                sh "gcloud app deploy --project $projectId --promote --image-url gcr.io/${projectId}/${imageName}"
+            }
+        }
+    }
+}
