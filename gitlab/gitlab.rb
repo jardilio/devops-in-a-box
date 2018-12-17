@@ -430,15 +430,15 @@ gitlab_rails['initial_root_password'] = ENV['INITIAL_PASSWORD']
 ### GitLab database settings
 ###! Docs: https://docs.gitlab.com/omnibus/settings/database.html
 ###! **Only needed if you use an external database.**
-gitlab_rails['db_adapter'] = "postgresql"
-gitlab_rails['db_encoding'] = "unicode"
+#gitlab_rails['db_adapter'] = "postgresql"
+#gitlab_rails['db_encoding'] = "unicode"
 # gitlab_rails['db_collation'] = nil
-gitlab_rails['db_database'] = "gitlab"
+#gitlab_rails['db_database'] = "gitlab"
 # gitlab_rails['db_pool'] = 10
-gitlab_rails['db_username'] = "gitlab"
-gitlab_rails['db_password'] = ENV['POSTGRESQL_USER_PASSWORD']
-gitlab_rails['db_host'] = "gitlab-database"
-gitlab_rails['db_port'] = 5432
+#gitlab_rails['db_username'] = "gitlab"
+#gitlab_rails['db_password'] = ENV['POSTGRESQL_USER_PASSWORD']
+#gitlab_rails['db_host'] = "gitlab-database"
+#gitlab_rails['db_port'] = 5432
 # gitlab_rails['db_socket'] = nil
 # gitlab_rails['db_sslmode'] = nil
 # gitlab_rails['db_sslrootcert'] = nil
@@ -451,10 +451,10 @@ gitlab_rails['db_port'] = 5432
 ###! Docs: https://docs.gitlab.com/omnibus/settings/redis.html
 
 #### Redis TCP connection
-gitlab_rails['redis_host'] = "gitlab-redis"
-gitlab_rails['redis_port'] = 6379
-gitlab_rails['redis_password'] = nil
-gitlab_rails['redis_database'] = 0
+#gitlab_rails['redis_host'] = "gitlab-redis"
+#gitlab_rails['redis_port'] = 6379
+#gitlab_rails['redis_password'] = nil
+#gitlab_rails['redis_database'] = 0
 
 #### Redis local UNIX socket (will be disabled if TCP method is used)
 # gitlab_rails['redis_socket'] = "/var/opt/gitlab/redis/redis.socket"
@@ -705,7 +705,7 @@ gitlab_rails['redis_database'] = 0
 ###! By default, reconfigure reloads postgresql if it is running. If you
 ###! change any of these settings, be sure to run `gitlab-ctl restart postgresql`
 ###! after reconfigure in order for the changes to take effect.
-postgresql['enable'] = false
+#postgresql['enable'] = false
 # postgresql['listen_address'] = nil
 # postgresql['port'] = 5432
 # postgresql['data_dir'] = "/var/opt/gitlab/postgresql/data"
@@ -715,7 +715,7 @@ postgresql['enable'] = false
 
 # https://hub.docker.com/r/gitlab/gitlab-ce/~/dockerfile/
 # Prevent Postgres from trying to allocate 25% of total memory
-postgresql['shared_buffers'] = "1MB"
+#postgresql['shared_buffers'] = "1MB"
 
 ### Advanced settings
 # postgresql['ha'] = false
